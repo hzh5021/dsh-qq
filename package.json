@@ -1,0 +1,27 @@
+{
+  "name": "dsh-qq",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bridges a OneBot QQ bot into DSH: the owner's direct messages open a session on the same home, answers go back to QQ, and files named with [SEND_FILE: path] are delivered.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "license": "MIT",
+  "author": "hzh5021",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hzh5021/dsh-qq.git"
+  },
+  "homepage": "https://github.com/hzh5021/dsh-qq#readme",
+  "engines": {
+    "node": ">=18"
+  }
+}

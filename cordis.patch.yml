@@ -1,0 +1,15 @@
+# bundle patch for dsh-qq：把这条 QQ 通道插进 profile 的花名册。
+#
+# 这里只放插件行，不放真配置 —— 包会被推到公开仓库，凭据、QQ 号、私人路径
+# 一旦写在这儿就跟着出门了。真要配就在 profile 的 cordis.patch.yml 里覆盖：
+#
+#   - id: qq
+#     name: dsh-qq
+#     config:
+#       wsUrl: ws://127.0.0.1:3001/?access_token=<YOUR_ONEBOT_TOKEN>
+#       ownerId: <YOUR_QQ_ID>            # 只放行这一个人，别人一律不理
+#       cwd: <WORK_DIR_FOR_THE_QQ_LINE>  # 这条线的来往落在哪儿
+#       logFile: <PATH_TO_LOG>
+- insert:
+    - id: qq
+      name: dsh-qq
