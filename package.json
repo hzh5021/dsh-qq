@@ -1,6 +1,6 @@
 {
   "name": "dsh-qq",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Bridges a OneBot QQ bot into DSH: the owner's direct messages open a session on the same home, answers go back to QQ, and files named with [SEND_FILE: path] are delivered.",
   "type": "module",

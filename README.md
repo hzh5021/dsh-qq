@@ -41,9 +41,9 @@ dsh plugin add hzh5021/dsh-qq
 | `approvalTimeoutMs` | `300000` | 等主人批/不批最多这么久，到点还给下一个应答者 |
 | `approvalRemindMs` | `90000` | 到点先催一句；`0` = 不催 |
 | `reconnectMaxMs` | `30000` | 重连退避的上限 |
-| `httpPort` | `3002` | 只监听本机的小状态口，读的是 JSON |
+| `httpPort` | `3002` | 只监听本机的状态口；**必须带启动时生成的 token**，没有就拿 401 |
 | `logFile` | `~/.dsh/dsh-qq/dsh-qq.log` | 日志文件 |
-| `qrPath` | `""` | OneBot 实现落的登录二维码图片路径（状态口 `/qr` 会把它吐出来） |
+| `qrPath` | `""` | OneBot 实现落的登录二维码图片路径（带 token 请求状态口 `/qr` 会把它吐出来） |
 | `napCatLog` | `""` | 解码 URL 所在的日志（二维码图扫不动时可以手敲那个 URL） |
 | `mediaDir` | `~/.dsh/dsh-qq/media` | 进来的图/语音/文件落这儿 |
 
@@ -75,7 +75,9 @@ dsh plugin add hzh5021/dsh-qq
 
 **换新会话**：主人发 `新对话`、`新会话`、`/new`、`/新对话`、`/新会话`、`换个话题`、`/clear`（不分大小写）就丢掉手里的会话，下一条消息就地开新的；`idleResetMs` 到了也会自行换新。
 
-**状态口**：本机 `http://127.0.0.1:<httpPort>/status`（连接态、ownerId、会话数、工作目录、二维码、日志尾部）和 `/qr`（二维码原图）。只读、只监听 `127.0.0.1`，给脚本或自己写的客户端读。
+**状态口**：本机 `http://127.0.0.1:<httpPort>/status?token=<启动时生成的 token>`，回连接态、会话列表（`userId` / `sessionId` / 已收字数）和时间戳；`/qr?token=…` 回二维码原图。token 也可以走 `x-dsh-qq-token` 请求头。
+
+这个口子**要鉴权，也不放行跨域**：token 每次启动随机生成、只在日志里印一次；没有 token 一律 401；响应不发 `Access-Control-Allow-Origin`，所以浏览器里的网页读不到。`/status` 不再回 `wsUrl`（那里面有 OneBot 的 access token）、不回日志尾部、不回二维码解码 URL。
 
 **日志写不进去会出声**：`logFile` 曾经指着一个不存在的目录，写失败被 `catch` 吞掉，于是「日志里没有 connected」被当成了断线的证据——那是一条从来没有出口的证据。现在写不进去会打一行 `LOG FILE UNWRITABLE`，并说明从这行起文件里看不到日志。
 
@@ -87,7 +89,7 @@ dsh plugin add hzh5021/dsh-qq
 - 只认一个 owner（`ownerId`）：群里、别人、机器人自己发的一律不理。**没配就是谁都不放行** —— 这是刻意的默认值，配好之前这条通道是哑的。
 - 审批搬到 QQ 依赖宿主把批准做成 `approval/request` 瀑布；别的形态接不上（会退回 `next()`）。
 - 出站文件按扩展名分三种段：`.silk/.amr/.slk` → 语音，`.png/.jpg/.jpeg/.gif/.webp/.bmp` → 图片，其余 → 文件。原生表情那类消息段不在支持范围。
-- 这个包不带浏览器界面：状态只在 `http://127.0.0.1:<httpPort>/status` 那个 JSON 口上，要面板自己接。
+- 这个包不带浏览器界面：状态只在 `http://127.0.0.1:<httpPort>/status?token=…` 上，要面板自己接；token 从日志里找。
 - 进来的媒体靠向 OneBot 实现要原文件，拿不到就只在正文里留一行「（没取到原文件）」，不拦消息。
 - 只用 Node 内置模块（内置 WebSocket、`node:http`、`node:fs`）。
 
